@@ -169,7 +169,7 @@ const RoomDetails = () => {
           {/* Circle Logo */}
           <div className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gray-100 flex items-center justify-center">
             <img
-              src={room.hotel?.owner?.image}
+              src={room.hotel.owner.image}
               alt="Host"
               className="h-8 w-8 object-contain"
             />
