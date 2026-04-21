@@ -1,55 +1,122 @@
+// import User from "../models/User.js";
+// import { Webhook } from "svix";
+
+// const clerkWebhooks = async (req, res) => {
+//   try {
+//     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+
+//     const headers = {
+//       "svix-id": req.headers["svix-id"],
+//       "svix-timestamp": req.headers["svix-timestamp"],
+//       "svix-signature": req.headers["svix-signature"],
+//     };
+//     await whook.verify(JSON.stringify(req.body), headers);
+//     const { data, type } = req.body;
+
+//     const userData = {
+//       _id: data.id,
+//       email: data.email_addresses[0].email_address, // ✅ fixed
+//       username: data.first_name + " " + data.last_name,
+//       image: data.image_url,
+//     };
+
+//     switch (type) {
+
+//       case "user.created":
+//         await User.create(userData);
+//         console.log("User created in DB");
+//         break;
+
+//       case "user.updated":
+//         await User.findByIdAndUpdate(data.id, userData);
+//         console.log("User updated in DB");
+//         break;
+
+//       case "user.deleted":
+//         await User.findByIdAndDelete(data.id);
+//         console.log("User deleted from DB");
+//         break;
+
+//       default:
+//         break;
+//     }
+
+//     res.json({ success: true });
+
+//   } catch (error) {
+//     console.log(error.message);
+//     res.json({ success: false, message: error.message });
+//   }
+// };
+
+// export default clerkWebhooks;
+
 import User from "../models/User.js";
 import { Webhook } from "svix";
 
+const clerkWebhooks = async (req, res) => {
 
-const clerkWebhooks = async(req , res)=>{
-    try{
-        // Create a svix instances with clerk webhook secret
-        const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
+  try {
 
-        // Getting headers
-        const headers={
-            "svix-id":req.headers["svix-id"],
-            "svix-timestamp":req.headers["svix-timestamp"],
-             "svix-signature":req.headers["svix-signature"],
-        };
-        // Verifiying Headers
-        await whook.verify(JSON.stringify(req.body),headers)
+    const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-        // Getting Data from request body
-        const {data, type} = req.body
+    const payload = req.body.toString();
 
-        const userData={
-            _id:data.id,
-            email:data.email_address[0].email_address,
-            username: data.first_name+" "+ data.last_name,
-            image: data.image_url,
+    webhook.verify(payload, {
+      "svix-id": req.headers["svix-id"],
+      "svix-timestamp": req.headers["svix-timestamp"],
+      "svix-signature": req.headers["svix-signature"],
+    });
 
-        }
+    const { data, type } = JSON.parse(payload);
 
-        // Switch cases for the different Evemnts
-        switch (type){
-            case "user.created":{
-                await User.create(userData)
-                break;
-            }
+    const userData = {
+      _id: data.id,
+      email: data.email_addresses[0].email_address,
+      username: `${data.first_name} ${data.last_name}`,
+      image: data.image_url,
+    };
 
-            case "user.updated":{
-                await User.findByIdAndUpdate(data.id,userData)
-                break;
-            }
-            case "user.deleted":{
-                await User.findByIdAndDelete(data.id)
-                break;
-            }
-            default:
-                break;
-        }
-        res.json({success:true, message:"Webhook Received"})
+    switch (type) {
 
-    } catch(error){
-        console.log(error.message)
-        res.json({success:false, message:error.message});
+      case "user.created":
+
+        await User.create(userData);
+
+        console.log("User created in MongoDB");
+
+        break;
+
+      case "user.updated":
+
+        await User.findByIdAndUpdate(data.id, userData);
+
+        console.log("User updated");
+
+        break;
+
+      case "user.deleted":
+
+        await User.findByIdAndDelete(data.id);
+
+        console.log("User deleted");
+
+        break;
+
+      default:
+        break;
     }
-}
+
+    res.json({ success: true });
+
+  } catch (error) {
+
+    console.log("Webhook error:", error.message);
+
+    res.json({ success: false });
+
+  }
+};
+
 export default clerkWebhooks;
+console.log("Webhook received");
