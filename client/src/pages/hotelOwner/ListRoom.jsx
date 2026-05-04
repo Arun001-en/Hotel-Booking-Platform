@@ -3,13 +3,33 @@ import { roomsDummyData } from "../../assets/assets";
 import Title from "../../components/Title";
 
 const ListRoom = () => {
-  const [rooms, setRooms] = useState(roomsDummyData);
+  const [rooms, setRooms] = useState(() => {
+    const blockedRooms = JSON.parse(localStorage.getItem('blockedRooms') || '[]');
+    return roomsDummyData.map(room => ({
+      ...room,
+      isAvailable: !blockedRooms.includes(room._id.toString())
+    }));
+  });
 
   // toggle availability function
   const toggleAvailability = (index) => {
     const updatedRooms = [...rooms];
-
-    updatedRooms[index].isAvailable = !updatedRooms[index].isAvailable;
+    const room = updatedRooms[index];
+    room.isAvailable = !room.isAvailable;
+    
+    // Update localStorage
+    const blockedRooms = JSON.parse(localStorage.getItem('blockedRooms') || '[]');
+    if (!room.isAvailable) {
+      if (!blockedRooms.includes(room._id.toString())) {
+        blockedRooms.push(room._id.toString());
+      }
+    } else {
+      const idx = blockedRooms.indexOf(room._id.toString());
+      if (idx > -1) {
+        blockedRooms.splice(idx, 1);
+      }
+    }
+    localStorage.setItem('blockedRooms', JSON.stringify(blockedRooms));
 
     setRooms(updatedRooms);
   };

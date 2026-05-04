@@ -1,7 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { assets } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const [destination, setDestination] = useState("");
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/rooms?city=${destination}`);
+  };
 
   const cities = [
     "New York",
@@ -29,7 +39,7 @@ const Hero = () => {
         and resorts. Start your journey today.
       </p>
 
-      <form className="bg-white text-gray-500 rounded-lg px-4 sm:px-6 py-4 mt-8 flex flex-col md:flex-row gap-4 w-full md:w-auto">
+      <form onSubmit={handleSearch} className="bg-white text-gray-500 rounded-lg px-4 sm:px-6 py-4 mt-8 flex flex-col md:flex-row gap-4 w-full md:w-auto">
 
         {/* Destination */}
         <div className="w-full md:w-auto">
@@ -44,6 +54,8 @@ const Hero = () => {
             type="text"
             className="w-full md:w-40 rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none"
             placeholder="Type here"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
             required
           />
 
@@ -64,6 +76,7 @@ const Hero = () => {
           <input
             id="checkIn"
             type="date"
+            min={today}
             className="w-full md:w-40 rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none"
           />
         </div>
@@ -78,6 +91,7 @@ const Hero = () => {
           <input
             id="checkOut"
             type="date"
+            min={today}
             className="w-full md:w-40 rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none"
           />
         </div>

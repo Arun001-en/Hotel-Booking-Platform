@@ -131,13 +131,25 @@ export const userDummyData = {
 export const hotelDummyData = {
     "_id": "67f76393197ac559e4089b72",
     "name": "Urbanza Suites",
-    "address": "Main Road  123 Street , 23 Colony",
+    "address": "Main Road 123 Street, 23 Colony",
     "contact": "+0123456789",
     "owner": userDummyData,
     "city": "New York",
+    "rating": 4.5,
     "createdAt": "2025-04-10T06:22:11.663Z",
     "updatedAt": "2025-04-10T06:22:11.663Z",
-    "__v": 0
+}
+
+export const hotelDummyData2 = {
+    "_id": "78a87404208bd660f5190c83",
+    "name": "Grand Horizon Resort",
+    "address": "Ocean Drive 456, Coastal Area",
+    "contact": "+9876543210",
+    "owner": userDummyData,
+    "city": "Dubai",
+    "rating": 4.9,
+    "createdAt": "2025-04-11T10:15:00.000Z",
+    "updatedAt": "2025-04-11T10:15:00.000Z",
 }
 
 // Rooms Dummy Data
@@ -155,6 +167,16 @@ export const roomsDummyData = [
         "__v": 0
     },
     {
+        "_id": "78a8747c197ac559e4089c10",
+        "hotel": hotelDummyData2,
+        "roomType": "Luxury Room",
+        "pricePerNight": 1250,
+        "amenities": ["Free WiFi", "Free Breakfast", "Pool Access", "Mountain View"],
+        "images": ["https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=1000", "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1000"],
+        "isAvailable": true,
+        "createdAt": "2025-04-12T08:00:00.000Z",
+    },
+    {
         "_id": "67f76452197ac559e4089b8e",
         "hotel": hotelDummyData,
         "roomType": "Double Bed",
@@ -165,6 +187,16 @@ export const roomsDummyData = [
         "createdAt": "2025-04-10T06:25:22.593Z",
         "updatedAt": "2025-04-10T06:25:22.593Z",
         "__v": 0
+    },
+    {
+        "_id": "78a8747c197ac559e4089c11",
+        "hotel": hotelDummyData2,
+        "roomType": "Family Suite",
+        "pricePerNight": 2200,
+        "amenities": ["Free WiFi", "Free Breakfast", "Room Service", "Pool Access"],
+        "images": ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000", "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1000"],
+        "isAvailable": true,
+        "createdAt": "2025-04-12T09:00:00.000Z",
     },
     {
         "_id": "67f76406197ac559e4089b82",
@@ -179,6 +211,16 @@ export const roomsDummyData = [
         "__v": 0
     },
     {
+        "_id": "78a8747c197ac559e4089c12",
+        "hotel": hotelDummyData2,
+        "roomType": "Luxury Room",
+        "pricePerNight": 850,
+        "amenities": ["Free WiFi", "Room Service", "Pool Access"],
+        "images": ["https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=1000"],
+        "isAvailable": true,
+        "createdAt": "2025-04-12T10:00:00.000Z",
+    },
+    {
         "_id": "67f763d8197ac559e4089b7a",
         "hotel": hotelDummyData,
         "roomType": "Single Bed",
@@ -189,6 +231,16 @@ export const roomsDummyData = [
         "createdAt": "2025-04-10T06:23:20.252Z",
         "updatedAt": "2025-04-10T06:23:20.252Z",
         "__v": 0
+    },
+    {
+        "_id": "78a8747c197ac559e4089c13",
+        "hotel": hotelDummyData2,
+        "roomType": "Single Bed",
+        "pricePerNight": 450,
+        "amenities": ["Free WiFi", "Free Breakfast"],
+        "images": ["https://images.unsplash.com/photo-1505691938895-1758d7eaa511?q=80&w=1000"],
+        "isAvailable": true,
+        "createdAt": "2025-04-12T11:00:00.000Z",
     }
 ]
 

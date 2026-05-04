@@ -35,22 +35,13 @@ import connectDB from "./configs/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
 import userRouter from "./routes/userRoutes.js";
-<<<<<<< HEAD
 import hotelRouter from "./routes/hotelRoutes.js";
 import connectCloudinary from "./configs/cloudinary.js";
 import roomRouter from "./routes/roomRoutes.js";
-
-connectDB()
-connectCloudinary();
-const app = express()
-=======
-import hotelROuter from "./routes/hotelRoutes.js";
-import connectCloudinary from "./configs/cloudinary.js";
-import roomRouter from "./routes/roomRoutes.js";
+import bookingRouter from "./routes/bookingRoutes.js";
 
 connectDB();
 connectCloudinary();
->>>>>>> 5ca1d5d (my updates)
 
 const app = express();
 
@@ -65,13 +56,6 @@ app.use(
   express.raw({ type: "application/json" })
 );
 
-<<<<<<< HEAD
-app.get('/', (req, res)=>res.send("API is Working"))
-app.use('/api/user',userRouter)
-app.use('/api/hotels',hotelRouter)
-app.use('/api/rooms',roomRouter)
-
-=======
 /*
 Clerk webhook endpoint
 */
@@ -87,9 +71,9 @@ app.use(clerkMiddleware());
 app.get("/", (req, res) => res.send("API is Working"));
 
 app.use("/api/user", userRouter);
-app.use("/api/hotels", hotelROuter);
+app.use("/api/hotels", hotelRouter);
 app.use("/api/rooms", roomRouter);
->>>>>>> 5ca1d5d (my updates)
+app.use("/api/bookings", bookingRouter);
 
 const PORT = process.env.PORT || 3000;
 
