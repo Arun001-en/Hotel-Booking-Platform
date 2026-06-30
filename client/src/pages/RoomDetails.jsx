@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { assets, facilityIcons, roomCommonData, roomsDummyData } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import { useAuth, useUser } from "@clerk/react";
+import { API_URL } from "../lib/api";
 
 const RoomDetails = () => {
   const { id } = useParams();
@@ -55,14 +56,13 @@ const RoomDetails = () => {
 
       const totalPrice = days * room.pricePerNight;
 
-      const response = await fetch("http://localhost:3000/api/bookings/create", {
+      const response = await fetch(`${API_URL}/api/bookings/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: `Bearer ${await getToken()}` // If needed
+          Authorization: `Bearer ${await getToken()}`,
         },
         body: JSON.stringify({
-          userId: user.id,
           roomId: room._id,
           hotelId: room.hotel._id,
           checkInDate: bookingData.checkIn,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { assets } from "../assets/assets";
+import { assets, roomsDummyData } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
@@ -7,21 +7,13 @@ const Hero = () => {
   const [destination, setDestination] = useState("");
 
   const today = new Date().toISOString().split('T')[0];
+  const cities = [...new Set(roomsDummyData.map((room) => room.hotel.city))];
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/rooms?city=${destination}`);
+    const city = destination.trim();
+    navigate(city ? `/rooms?city=${encodeURIComponent(city)}` : "/rooms");
   };
-
-  const cities = [
-    "New York",
-    "London",
-    "Paris",
-    "Dubai",
-    "Tokyo",
-    "Delhi",
-    "Mumbai"
-  ];
 
   return (
     <div className="flex flex-col items-start justify-center px-4 sm:px-6 md:px-16 lg:px-24 text-white bg-[url('/src/assets/heroImage.png')] bg-no-repeat bg-cover bg-center min-h-screen">
@@ -44,7 +36,7 @@ const Hero = () => {
         {/* Destination */}
         <div className="w-full md:w-auto">
           <div className="flex items-center gap-2">
-            <img src={assets.calendarIcon} alt="" className="h-4" />
+            <img src={assets.calenderIcon} alt="" className="h-4" />
             <label htmlFor="destinationInput">Destination</label>
           </div>
 
@@ -56,7 +48,6 @@ const Hero = () => {
             placeholder="Type here"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
-            required
           />
 
           <datalist id="destinations">
@@ -69,7 +60,7 @@ const Hero = () => {
         {/* Check In */}
         <div className="w-full md:w-auto">
           <div className="flex items-center gap-2">
-            <img src={assets.calendarIcon} alt="" className="h-4" />
+            <img src={assets.calenderIcon} alt="" className="h-4" />
             <label htmlFor="checkIn">Check in</label>
           </div>
 
@@ -84,7 +75,7 @@ const Hero = () => {
         {/* Check Out */}
         <div className="w-full md:w-auto">
           <div className="flex items-center gap-2">
-            <img src={assets.calendarIcon} alt="" className="h-4" />
+            <img src={assets.calenderIcon} alt="" className="h-4" />
             <label htmlFor="checkOut">Check out</label>
           </div>
 

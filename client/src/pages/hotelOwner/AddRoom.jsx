@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
+import { useAuth } from "@clerk/react";
+import { API_URL } from "../../lib/api";
 
 const AddRoom = () => {
+  const { getToken } = useAuth();
   const [images, setImages] = useState({
     1: null,
     2: null,
@@ -21,9 +24,65 @@ const AddRoom = () => {
       "Pool Access": false,
     },
   });
+  const [loading, setLoading] = useState(false);
+
+  const selectedImages = Object.values(images).filter(Boolean);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (selectedImages.length === 0) {
+      alert("Please upload at least one room image.");
+      return;
+    }
+
+    const amenities = Object.keys(input.amenities).filter(
+      (amenity) => input.amenities[amenity],
+    );
+
+    const formData = new FormData();
+    formData.append("roomType", input.roomType);
+    formData.append("pricePerNight", input.pricePerNight);
+    formData.append("amenities", JSON.stringify(amenities));
+    selectedImages.forEach((image) => formData.append("images", image));
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/rooms`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Room added successfully.");
+        setImages({ 1: null, 2: null, 3: null, 4: null });
+        setInput({
+          roomType: "",
+          pricePerNight: 0,
+          amenities: {
+            "Free Wifi": false,
+            "Free Breakfast": false,
+            "Room Service": false,
+            "Mountain View": false,
+            "Pool Access": false,
+          },
+        });
+      } else {
+        alert(data.message || "Unable to add room.");
+      }
+    } catch (error) {
+      alert(`Unable to add room: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <Title
         align="left"
         font="outfit"
@@ -56,7 +115,7 @@ const AddRoom = () => {
               onChange={(e) =>
                 setImages({
                   ...images,
-                  [key]: e.target.files[0],
+                  [key]: e.target.files?.[0] || null,
                 })
               }
             />
@@ -79,6 +138,7 @@ const AddRoom = () => {
               })
             }
             className="border opacity-70 border-gray-300 mt-1 rounded p-2 w-full"
+            required
           >
             <option value="">Select Room Type</option>
             <option value="Single Bed">Single Bed</option>
@@ -106,6 +166,8 @@ const AddRoom = () => {
                 pricePerNight: e.target.value,
               })
             }
+            min="1"
+            required
           />
         </div>
       </div>
@@ -141,9 +203,10 @@ const AddRoom = () => {
 
       <button
         type="submit"
+        disabled={loading}
         className="bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer"
       >
-        Add Room
+        {loading ? "Adding..." : "Add Room"}
       </button>
     </form>
   );

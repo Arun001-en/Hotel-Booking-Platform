@@ -5,16 +5,19 @@ import Hotel from "../models/Hotel.js";
 // Api to create a new booking
 export const createBooking = async (req, res) => {
     try {
-        const { userId, roomId, hotelId, checkInDate, checkOutDate, guests, totalPrice } = req.body;
+        const { roomId, hotelId, checkInDate, checkOutDate, guests, totalPrice } = req.body;
 
         // Check if room is available (basic check for now)
         const room = await Room.findById(roomId);
         if (!room || !room.isAvailable) {
             return res.json({ success: false, message: "Room is not available" });
         }
+        if (room.hotel.toString() !== hotelId) {
+            return res.json({ success: false, message: "Invalid hotel for selected room" });
+        }
 
         const bookingData = {
-            user: userId,
+            user: req.auth.userId,
             room: roomId,
             hotel: hotelId,
             checkInDate,
@@ -38,8 +41,7 @@ export const createBooking = async (req, res) => {
 // Api to get bookings for a user
 export const getUserBookings = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const bookings = await Booking.find({ user: userId }).populate("hotel room");
+        const bookings = await Booking.find({ user: req.auth.userId }).populate("hotel room");
         res.json({ success: true, bookings });
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -49,8 +51,7 @@ export const getUserBookings = async (req, res) => {
 // Api to get owner dashboard data
 export const getOwnerDashboard = async (req, res) => {
     try {
-        const ownerId = req.auth.userId;
-        const hotel = await Hotel.findOne({ owner: ownerId });
+        const hotel = await Hotel.findOne({ owner: req.auth.userId });
         
         if (!hotel) {
             return res.json({ success: false, message: "Hotel not found" });

@@ -33,13 +33,12 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 const AllRooms = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialCity = searchParams.get("city") || "";
+  const citySearch = searchParams.get("city") || "";
 
   const [openFilters, setOpenFilters] = useState(false);
   const [selectedRoomTypes, setSelectedRoomTypes] = useState([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
   const [sortOption, setSortOption] = useState("");
-  const [citySearch, setCitySearch] = useState(initialCity);
 
   const roomTypes = ["Single Bed", "Double Bed", "Luxury Room", "Family Suite"];
 

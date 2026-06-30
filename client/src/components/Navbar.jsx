@@ -30,33 +30,44 @@ const Navbar = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { openSignIn } = useClerk();
   const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isHomePage = location.pathname === "/";
+  const shouldUseScrolledStyle = !isHomePage || isScrolled;
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    const city = searchQuery.trim();
+    navigate(city ? `/rooms?city=${encodeURIComponent(city)}` : "/rooms");
+    setIsSearchOpen(false);
+    setIsMenuOpen(false);
+  };
+
   useEffect(() => {
-    if(location.pathname !=='/'){
-        setIsScrolled(true);
-        return;
-    }else{
-        setIsScrolled(false);
+    if (!isHomePage) {
+      return undefined;
     }
-    setIsScrolled(prev =>location.pathname !== '/' ? true : prev)
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [location.pathname]);
+  }, [isHomePage]);
 
   return (
     <nav
       className={`fixed top-0 left-0 w-full flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 z-50 
       ${
-        isScrolled
+        shouldUseScrolledStyle
           ? "bg-white/80 shadow-md text-gray-700 backdrop-blur-lg py-3 md:py-4"
           : "py-4 md:py-6"
       }`}
@@ -66,7 +77,7 @@ const Navbar = () => {
         <img
           src={assets.logo}
           alt="logo"
-          className={`h-9 ${isScrolled ? "invert opacity-80" : ""}`}
+          className={`h-9 ${shouldUseScrolledStyle ? "invert opacity-80" : ""}`}
         />
       </a>
 
@@ -77,13 +88,13 @@ const Navbar = () => {
             key={i}
             href={link.path}
             className={`group flex flex-col gap-0.5 ${
-              isScrolled ? "text-gray-700" : "text-white"
+              shouldUseScrolledStyle ? "text-gray-700" : "text-white"
             }`}
           >
             {link.name}
             <div
               className={`${
-                isScrolled ? "bg-gray-700" : "bg-white"
+                shouldUseScrolledStyle ? "bg-gray-700" : "bg-white"
               } h-0.5 w-0 group-hover:w-full transition-all duration-300`}
             />
           </a>
@@ -91,7 +102,7 @@ const Navbar = () => {
 
         <button
           className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${
-            isScrolled ? "text-black" : "text-white"
+            shouldUseScrolledStyle ? "text-black" : "text-white"
           } transition-all`} onClick={()=> navigate('/owner')}
         >
           Dashboard
@@ -100,11 +111,44 @@ const Navbar = () => {
 
       {/* Desktop Right */}
       <div className="hidden md:flex items-center gap-4">
-        <img
-          src={assets.searchIcon}
-          alt="search"
-          className={`${isScrolled && "invert"} h-7 transition-all duration-500`}
-        />
+        <form
+          onSubmit={handleSearch}
+          className={`flex items-center overflow-hidden rounded-full border transition-all duration-300 ${
+            shouldUseScrolledStyle
+              ? "border-gray-300 bg-white"
+              : "border-white/60 bg-white/10"
+          } ${isSearchOpen ? "w-56 px-3 py-1.5" : "w-9 border-transparent"}`}
+        >
+          {isSearchOpen && (
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search city"
+              className={`w-full bg-transparent text-sm outline-none ${
+                shouldUseScrolledStyle
+                  ? "text-gray-700 placeholder:text-gray-400"
+                  : "text-white placeholder:text-white/70"
+              }`}
+              autoFocus
+            />
+          )}
+
+          <button
+            type={isSearchOpen ? "submit" : "button"}
+            aria-label="Search rooms"
+            onClick={() => {
+              if (!isSearchOpen) setIsSearchOpen(true);
+            }}
+            className="flex h-7 w-7 shrink-0 items-center justify-center cursor-pointer"
+          >
+            <img
+              src={assets.searchIcon}
+              alt=""
+              className={`${shouldUseScrolledStyle && "invert"} h-5 transition-all duration-500`}
+            />
+          </button>
+        </form>
 
         {user ? (
           <UserButton>
@@ -120,7 +164,7 @@ const Navbar = () => {
           <button
             onClick={openSignIn}
             className={`px-8 py-2.5 rounded-full ml-4 transition-all duration-500 ${
-              isScrolled ? "text-white bg-black" : "bg-white text-black"
+              shouldUseScrolledStyle ? "text-white bg-black" : "bg-white text-black"
             }`}
           >
             Login
@@ -144,7 +188,7 @@ const Navbar = () => {
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           src={assets.menuIcon}
           alt=""
-          className={`${isScrolled && "invert"} h-4`}
+          className={`${shouldUseScrolledStyle && "invert"} h-4`}
         />
       </div>
 
@@ -166,6 +210,19 @@ const Navbar = () => {
             {link.name}
           </a>
         ))}
+
+        <form onSubmit={handleSearch} className="flex w-64 items-center gap-2 rounded-full border border-gray-300 px-4 py-2">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search city"
+            className="w-full bg-transparent text-sm outline-none"
+          />
+          <button type="submit" aria-label="Search rooms" className="cursor-pointer">
+            <img src={assets.searchIcon} alt="" className="h-5 invert" />
+          </button>
+        </form>
 
         {user && <button className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all" onClick={()=> navigate('/owner')}>
           Dashboard

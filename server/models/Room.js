@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Hotel from "./Hotel.js";
  
 const roomSchema=new mongoose.Schema({
     hotel:{type:mongoose.Schema.Types.ObjectId,required:true,ref:"Hotel"},

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
 import { useAuth } from "@clerk/react";
+import { API_URL } from "../../lib/api";
 
 const Dashboard = () => {
   const { getToken } = useAuth();
@@ -12,11 +13,11 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/bookings/owner-dashboard", {
+      const response = await fetch(`${API_URL}/api/bookings/owner-dashboard`, {
         headers: {
-          // Authorization: `Bearer ${await getToken()}` // If needed by clerkMiddleware on backend
+          Authorization: `Bearer ${await getToken()}`,
         }
       });
       const data = await response.json();
@@ -28,7 +29,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -36,7 +37,7 @@ const Dashboard = () => {
     // "Real-time" polling every 30 seconds
     const interval = setInterval(fetchDashboardData, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchDashboardData]);
 
   if (loading) return <div className="p-10 text-center">Loading Dashboard...</div>;
 

@@ -1,7 +1,6 @@
 import Hotel from "../models/Hotel.js";
 import { v2 as cloudinary } from "cloudinary";
 import Room from "../models/Room.js";
-import { populate } from "dotenv";
 
 
 // Api to create new Hotel
@@ -11,6 +10,7 @@ export const createRooms = async(req , res) =>{
         const hotel = await Hotel.findOne({owner:req.auth.userId})
 
         if(!hotel) return res.json({success:false, message:"No Hotel Found"});
+        if(!req.files?.length) return res.json({success:false, message:"Please upload at least one image"});
 
         // Uplaod images to Cloudinary
         const uploadImages = req.files.map(async(file)=>{
@@ -67,6 +67,7 @@ export const toggleRoomAvailability = async(req , res) =>{
     try {
         const { roomId } = req.body;
         const room = await Room.findById(roomId);
+        if(!room) return res.json({ success: false, message: "Room not found" });
         room.isAvailable = !room.isAvailable;
         await room.save();
         res.json({ success: true, message: "Availability updated" });

@@ -1,38 +1,64 @@
-import React, { useState } from "react";
-import { roomsDummyData } from "../../assets/assets";
+import React, { useCallback, useEffect, useState } from "react";
 import Title from "../../components/Title";
+import { useAuth } from "@clerk/react";
+import { API_URL } from "../../lib/api";
 
 const ListRoom = () => {
-  const [rooms, setRooms] = useState(() => {
-    const blockedRooms = JSON.parse(localStorage.getItem('blockedRooms') || '[]');
-    return roomsDummyData.map(room => ({
-      ...room,
-      isAvailable: !blockedRooms.includes(room._id.toString())
-    }));
-  });
+  const { getToken } = useAuth();
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // toggle availability function
-  const toggleAvailability = (index) => {
-    const updatedRooms = [...rooms];
-    const room = updatedRooms[index];
-    room.isAvailable = !room.isAvailable;
-    
-    // Update localStorage
-    const blockedRooms = JSON.parse(localStorage.getItem('blockedRooms') || '[]');
-    if (!room.isAvailable) {
-      if (!blockedRooms.includes(room._id.toString())) {
-        blockedRooms.push(room._id.toString());
+  const fetchRooms = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/rooms/owner`, {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setRooms(data.rooms);
       }
-    } else {
-      const idx = blockedRooms.indexOf(room._id.toString());
-      if (idx > -1) {
-        blockedRooms.splice(idx, 1);
-      }
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    } finally {
+      setLoading(false);
     }
-    localStorage.setItem('blockedRooms', JSON.stringify(blockedRooms));
+  }, [getToken]);
 
-    setRooms(updatedRooms);
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
+
+  const toggleAvailability = async (roomId) => {
+    try {
+      const response = await fetch(`${API_URL}/api/rooms/toggle-availability`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getToken()}`,
+        },
+        body: JSON.stringify({ roomId }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setRooms((prevRooms) =>
+          prevRooms.map((room) =>
+            room._id === roomId
+              ? { ...room, isAvailable: !room.isAvailable }
+              : room,
+          ),
+        );
+      } else {
+        alert(data.message || "Unable to update availability.");
+      }
+    } catch (error) {
+      alert(`Unable to update availability: ${error.message}`);
+    }
   };
+
+  if (loading) return <div className="p-10 text-center">Loading rooms...</div>;
 
   return (
     <div>
@@ -66,8 +92,8 @@ const ListRoom = () => {
           </thead>
 
           <tbody className="text-sm">
-            {rooms.map((item, index) => (
-              <tr key={index}>
+            {rooms.length > 0 ? rooms.map((item) => (
+              <tr key={item._id}>
                 {/* ROOM TYPE */}
 
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
@@ -98,7 +124,7 @@ const ListRoom = () => {
                       type="checkbox"
                       className="sr-only peer"
                       checked={item.isAvailable}
-                      onChange={() => toggleAvailability(index)}
+                      onChange={() => toggleAvailability(item._id)}
                     />
 
                     <div className="w-12 h-7 bg-slate-300 rounded-full peer-checked:bg-blue-600 transition-colors duration-200"></div>
@@ -107,7 +133,13 @@ const ListRoom = () => {
                   </label>
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan="4" className="py-10 text-center text-gray-500">
+                  No rooms found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

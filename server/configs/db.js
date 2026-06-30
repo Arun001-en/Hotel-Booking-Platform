@@ -100,7 +100,9 @@ const connectDB = async () => {
 
     mongoose.connection.on("connected", () => {
       console.log("MongoDB Connected Successfully");
-      seedInitialData(); // Run seed after connection
+      if (process.env.SEED_DB === "true") {
+        seedInitialData();
+      }
     });
 
     mongoose.connection.on("error", (err) => {
